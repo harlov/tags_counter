@@ -44,3 +44,4 @@ def get_task(task_id):
     if task is None:
         raise BadRequest('task not found', 404)
     return result(TAGS_TASK_SCHEMA.dump(task).data)
+

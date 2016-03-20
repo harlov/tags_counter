@@ -37,6 +37,21 @@ def calc_tags(input_task):
     }})
 
     response = requests.get(input_task['target_url'])
+    if 'Content-Type' not in response.headers:
+        mongo.get_db().tasks.update_one({'task_id': input_task['task_id']}, {'$set': {
+            'state': TagsTaskSchema.STATE_ERROR,
+            'result': 'no content type header'
+        }})
+        return
+
+    resource_type = response.headers['Content-Type'].split(';')[0]
+    if resource_type.strip() != 'text/html':
+        mongo.get_db().tasks.update_one({'task_id': input_task['task_id']}, {'$set': {
+            'state': TagsTaskSchema.STATE_ERROR,
+            'result': 'content not is html page'
+        }})
+        return
+
     if response.status_code != 200:
         mongo.get_db().tasks.update_one({'task_id': input_task['task_id']}, {'$set': {
             'state': TagsTaskSchema.STATE_ERROR,
