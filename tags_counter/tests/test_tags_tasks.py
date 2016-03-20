@@ -23,7 +23,7 @@ class TestTagsTasks(TestCase):
 
         with requests_mock.Mocker() as m:
             with open('./test_set_openflashcards.html') as test_set_content:
-                m.get('http://testpage.test', text=test_set_content.readline())
+                m.get('http://testpage.test', text=test_set_content.readline(), headers={'Content-Type': 'text/html'})
             mongo.get_db().tasks.insert_one(mock_input)
             response = calc_tags.apply_async(args=(mock_input,), task_id=mock_input['task_id'])
             task_instance = mongo.get_db().tasks.find_one({'task_id': mock_input['task_id']})
