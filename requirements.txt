@@ -1,0 +1,8 @@
+flask==0.10
+marshmallow==2.6.1
+flask_script
+Celery
+pymongo==3.2.2
+requests[security]
+requests_mock
+gunicorn
