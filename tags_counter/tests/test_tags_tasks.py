@@ -30,3 +30,20 @@ class TestTagsTasks(TestCase):
 
             self.assertEqual(task_instance['state'], 'done')
             self.assertIsNotNone(task_instance['result'])
+
+    def test_run_image_url(self):
+        """
+        должно изменить state задачи на error
+        :return:
+        """
+        celery_app.conf.update({'CELERY_ALWAYS_EAGER': True})
+        mock_input = {'target_url': 'http://testpage.test/img.png', 'task_id': 'la-la-la'}
+
+        with requests_mock.Mocker() as m:
+
+            m.get('http://testpage.test/img.png', text='abcd', headers={'Content-Type': 'image/png'})
+            mongo.get_db().tasks.insert_one(mock_input)
+            response = calc_tags.apply_async(args=(mock_input,), task_id=mock_input['task_id'])
+            task_instance = mongo.get_db().tasks.find_one({'task_id': mock_input['task_id']})
+
+            self.assertEqual(task_instance['state'], 'error')
